@@ -59,7 +59,14 @@ class Market extends Common
                     }
                 }
             }
-            file_put_contents(DATA.'/cache/market.current', file_get_contents($this->url.'/?o='.substr($optout, 0, -1)));
+            $curl_handle=curl_init();
+            curl_setopt($curl_handle, CURLOPT_URL,$this->url.'/?o='.substr($optout, 0, -1));
+            curl_setopt($curl_handle, CURLOPT_CONNECTTIMEOUT, 2);
+            curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER, 1);
+            $json = curl_exec($curl_handle);
+            curl_close($curl_handle);
+            
+            file_put_contents(DATA.'/cache/market.current', $json);
             copy(DATA.'/cache/market.current', DATA.'/cache/market.last');
         } else {
             if (time()-filemtime(DATA.'/cache/market.current') > 24 * 3600) {
